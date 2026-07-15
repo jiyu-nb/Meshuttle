@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>织梭悬浮窗</title>
+  <link rel="stylesheet" href="mini.css">
+</head>
+<body>
+  <main class="float-shell">
+    <header class="float-header">
+      <div class="brand"><svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 12v20c0 5 4 8 9 8h10c5 0 9-3 9-8V12M14 17h20M14 25h20M17 33h14"/></svg><strong>织梭</strong></div>
+      <nav class="window-actions" aria-label="窗口控制">
+        <button type="button" id="settings" title="打开连接设置"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 14.5l2 1.5-2 3-2.4-1a8 8 0 0 1-2.1 1.2L14 22h-4l-.5-2.8A8 8 0 0 1 7.4 18L5 19l-2-3 2-1.5a8 8 0 0 1 0-5L3 8l2-3 2.4 1a8 8 0 0 1 2.1-1.2L10 2h4l.5 2.8A8 8 0 0 1 16.6 6L19 5l2 3-2 1.5a8 8 0 0 1 0 5z"/></svg><span class="sr-only">打开连接设置</span></button>
+        <button type="button" id="openMain" title="打开完整投递箱"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v18h18v-5M12 3h9v9M21 3l-11 11"/></svg><span class="sr-only">打开完整投递箱</span></button>
+        <button type="button" id="minimize" title="最小化悬浮窗"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">最小化悬浮窗</span></button>
+        <button type="button" class="close" id="quit" title="退出织梭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span class="sr-only">退出织梭</span></button>
+      </nav>
+    </header>
+
+    <div class="connection" id="connection" role="status"><i></i><b>正在连接设备</b></div>
+
+    <section class="quick-drop" id="dropZone" aria-label="文件和文字拖放区">
+      <svg class="drop-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M17 13h30v24H17zM10 37h14l4 7h8l4-7h14v14H10z"/><path d="M32 8v24m-7-7 7 7 7-7"/></svg>
+      <div class="drop-text"><h1>拖到这里发送</h1><p>支持文字、文件和多文件拖放</p></div>
+    </section>
+
+    <div class="quick-actions">
+      <button type="button" id="focusText">添加文字</button>
+      <button type="button" id="chooseFileMini">选择文件</button>
+      <input id="miniFileInput" type="file" multiple hidden>
+    </div>
+    <section class="quick-text">
+      <label class="sr-only" for="textInput">要发送的文字</label>
+      <input id="textInput" maxlength="1000000" placeholder="输入或粘贴文字，按 Enter 发送">
+      <button type="button" id="sendText">发送</button>
+    </section>
+
+    <div class="activity" id="activity" role="status" aria-live="polite" hidden></div>
+  </main>
+  <script src="mini.js"></script>
+</body>
+</html>

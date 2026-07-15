@@ -1,0 +1,18 @@
+services:
+  meshuttle:
+    build: ./server
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      ACCESS_TOKEN: "${ACCESS_TOKEN:?Set ACCESS_TOKEN in .env}"
+      DATA_DIR: /data
+      HOST: 0.0.0.0
+      PORT: 8787
+      RETENTION_MS: "${RETENTION_MS:-259200000}"
+      MAX_FILE_BYTES: "${MAX_FILE_BYTES:-2147483648}"
+    volumes:
+      - meshuttle_data:/data
+
+volumes:
+  meshuttle_data:

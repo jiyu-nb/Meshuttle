@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm --prefix client ci
+
+      - name: Fetch verified Syncthing binary
+        run: npm --prefix client run fetch:syncthing
+
+      - name: Run tests
+        run: |
+          npm --prefix server test
+          npm --prefix client test
+
+      - name: Build Windows installer
+        run: npm --prefix client run dist
+
+      - name: Package source and hashes
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          $sourceArchive = "Meshuttle-$version-source.zip"
+          $installer = "client/release/Meshuttle-Setup-$version.exe"
+          git archive --format=zip --prefix=meshuttle/ --output=$sourceArchive HEAD
+          $lines = @(
+            "{0}  {1}" -f (Get-FileHash -Algorithm SHA256 $installer).Hash, (Split-Path -Leaf $installer)
+            "{0}  {1}" -f (Get-FileHash -Algorithm SHA256 $sourceArchive).Hash, $sourceArchive
+          )
+          $lines | Set-Content -Encoding ascii SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          gh release create $env:GITHUB_REF_NAME `
+            "client/release/Meshuttle-Setup-$version.exe" `
+            "Meshuttle-$version-source.zip" `
+            "SHA256SUMS.txt" `
+            --verify-tag `
+            --title "织梭 Meshuttle $version" `
+            --notes-file "docs/release-notes-v1.0.0.md"

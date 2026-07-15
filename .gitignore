@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+data/
+*.log
+client/deployment-config.json
+client/server-cert.pem
+client/electron-dist/
+client/vendor/syncthing/syncthing.exe
+.tmp/

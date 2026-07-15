@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>织梭 Meshuttle</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand" aria-label="织梭 Meshuttle">
+        <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 12v20c0 5 4 8 9 8h10c5 0 9-3 9-8V12M14 17h20M14 25h20M17 33h14"/></svg>
+        <div><strong>织梭</strong><span>Meshuttle</span></div>
+      </div>
+
+      <nav class="side-nav" aria-label="主导航">
+        <div class="nav-item active" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h5l2 3h4l2-3h5v7H3zM5 12l2-7h10l2 7"/></svg>
+          <span>投递箱</span>
+        </div>
+        <button type="button" class="nav-item" id="openGroup">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c.4-4 2.4-6 6-6s5.6 2 6 6M14 15c3.5-.5 6 1 7 4"/></svg>
+          <span>设备组</span>
+        </button>
+        <button type="button" class="nav-item" id="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 14.5l2 1.5-2 3-2.4-1a8 8 0 0 1-2.1 1.2L14 22h-4l-.5-2.8A8 8 0 0 1 7.4 18L5 19l-2-3 2-1.5a8 8 0 0 1 0-5L3 8l2-3 2.4 1a8 8 0 0 1 2.1-1.2L10 2h4l.5 2.8A8 8 0 0 1 16.6 6L19 5l2 3-2 1.5a8 8 0 0 1 0 5z"/></svg>
+          <span>连接设置</span>
+        </button>
+      </nav>
+
+      <div class="side-status">
+        <div class="status-title"><span class="status-dot"></span><b id="sideStatus">正在连接</b></div>
+        <p id="modeDescription">正在读取当前连接方式</p>
+      </div>
+      <footer><span id="versionText">v1.0.0</span><span>MIT</span><span>作者 集御</span></footer>
+    </aside>
+
+    <section class="content">
+      <header class="content-header">
+        <div><p class="eyebrow">PRIVATE DEVICE MESH</p><h1>跨设备投递箱</h1></div>
+        <div class="connection" id="connection" role="status"><span></span><b>正在连接</b></div>
+      </header>
+
+      <section class="composer" id="dropZone" aria-label="文件和文字拖放区">
+        <div class="drop-copy">
+          <svg class="drop-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M17 13h30v24H17zM10 37h14l4 7h8l4-7h14v14H10z"/><path d="M32 8v24m-7-7 7 7 7-7"/></svg>
+          <div><h2>拖入文字或文件，立即发送到其他设备</h2><p id="retentionCopy">正在读取留存时长</p></div>
+        </div>
+
+        <div class="toolbar" aria-label="投递操作">
+          <button type="button" class="tool-button primary" id="addText">添加文字</button>
+          <button type="button" class="tool-button" id="chooseFile">选择文件</button>
+          <button type="button" class="tool-button" id="selectAll" disabled>全选内容</button>
+          <button type="button" class="tool-button" id="downloadSelected" disabled>下载所选文件</button>
+          <button type="button" class="tool-button danger" id="deleteSelected" disabled>删除所选</button>
+          <button type="button" class="tool-button subtle" id="refresh">刷新列表</button>
+          <input type="file" id="fileInput" multiple hidden>
+        </div>
+
+        <div class="text-composer" id="textComposer">
+          <label for="textInput">投递文字</label>
+          <div class="text-row">
+            <textarea id="textInput" maxlength="1000000" placeholder="输入或粘贴文字，Ctrl + Enter 发送"></textarea>
+            <button type="button" class="send" id="sendText">发送文字</button>
+          </div>
+        </div>
+        <div class="progress" id="progress" role="status" hidden></div>
+      </section>
+
+      <section class="feed-section" aria-labelledby="feedTitle">
+        <div class="section-title"><div><h2 id="feedTitle">最近投递</h2><span id="selectionInfo" hidden></span></div><span id="itemCount">正在加载</span></div>
+        <div class="feed" id="feed" aria-live="polite" aria-busy="true"></div>
+        <div class="empty" id="empty" hidden>
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 18h40v32H12zM12 27h13l5 7h4l5-7h13"/></svg>
+          <h3>投递箱还是空的</h3>
+          <p>拖入内容，或者选择一个文件开始。</p>
+          <button type="button" id="emptyChoose">选择第一个文件</button>
+        </div>
+      </section>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="renderer.js"></script>
+</body>
+</html>

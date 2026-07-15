@@ -1,0 +1,21 @@
+[Unit]
+Description=Meshuttle Server
+After=network.target
+
+[Service]
+Type=simple
+User=meshuttle
+Group=meshuttle
+WorkingDirectory=/opt/meshuttle/server
+EnvironmentFile=/etc/meshuttle.env
+ExecStart=/usr/bin/node /opt/meshuttle/server/src/server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/meshuttle
+
+[Install]
+WantedBy=multi-user.target

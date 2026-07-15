@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>织梭连接设置</title>
+  <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+  <main class="setup-shell">
+    <header class="setup-header">
+      <div class="brand-line"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 12v20c0 5 4 8 9 8h10c5 0 9-3 9-8V12M14 17h20M14 25h20M17 33h14"/></svg><div><b>织梭</b><span>Meshuttle · 作者 集御</span></div></div>
+      <p class="eyebrow">CHOOSE WHERE YOUR DATA LIVES</p>
+      <h1>选择内容保存在哪里</h1>
+      <p class="lead">连接自己的服务器、在局域网托管，或者创建没有固定主机的设备组。</p>
+    </header>
+
+    <nav class="mode-tabs" aria-label="连接方式">
+      <button type="button" data-mode="remote" class="active">远程服务器</button>
+      <button type="button" data-mode="host">本机托管</button>
+      <button type="button" data-mode="p2p">设备互联</button>
+    </nav>
+
+    <form id="remoteForm" class="setup-form">
+      <div class="form-intro"><b>连接已部署的 Meshuttle 服务</b><span>适合需要固定在线存储或已有公网服务器的用户。</span></div>
+      <label for="serverUrl">服务器地址</label>
+      <input id="serverUrl" type="url" placeholder="https://meshuttle.example.com 或 http://192.168.1.10:8787" required>
+      <label for="remoteToken">访问码</label>
+      <input id="remoteToken" type="text" minlength="24" autocomplete="off" placeholder="服务器生成的至少 24 位访问码" required>
+      <label for="certName">自签名 HTTPS 证书（可选）</label>
+      <span class="file-row"><input id="certName" type="text" placeholder="受信任的公网证书不需要选择" readonly><button type="button" id="chooseCert">选择 PEM 证书</button></span>
+      <input id="certInput" type="file" accept=".pem,.crt,.cer" hidden>
+      <div class="notice">局域网地址可以使用 HTTP；公网服务器应使用受信任的 HTTPS 域名。</div>
+      <button class="save" type="submit">验证并保存连接</button>
+    </form>
+
+    <form id="hostForm" class="setup-form" hidden>
+      <div class="form-intro"><b>让这台电脑保存全部内容</b><span>适合可信局域网；这台电脑需要保持开机并运行织梭。</span></div>
+      <div class="two-columns">
+        <div><label for="hostPort">监听端口</label><input id="hostPort" type="number" min="1024" max="65535" value="8787" required></div>
+        <div><label for="retentionDays">内容保留天数</label><input id="retentionDays" type="number" min="1" max="30" value="3" required></div>
+      </div>
+      <label for="hostToken">共享访问码</label>
+      <span class="file-row"><input id="hostToken" type="text" minlength="24" autocomplete="off" required><button type="button" id="randomToken">重新生成访问码</button></span>
+      <div class="lan-box" id="lanBox" hidden><b>其他电脑可填写下方任一地址</b><div id="lanUrls"></div><span>同时使用上面的共享访问码。首次使用时，请允许 Windows 防火墙的“专用网络”访问。</span></div>
+      <div class="notice warning">本机托管不提供跨公网穿透和故障转移。不同网络之间请使用“设备互联”或公网 HTTPS 服务。</div>
+      <button class="save" type="submit">启动本机服务器</button>
+    </form>
+
+    <section id="p2pPanel" class="setup-form" hidden>
+      <div id="p2pOnboarding">
+        <div class="form-intro"><b>无需自备服务器，也能跨网络互联</b><span>设备优先直连，无法直连时使用加密公共中继；加入后所有设备地位平等。</span></div>
+        <div class="sub-tabs" aria-label="设备组操作">
+          <button type="button" data-p2p-action="create" class="active">创建新设备组</button>
+          <button type="button" data-p2p-action="join">加入已有设备组</button>
+        </div>
+        <form id="p2pForm" class="inner-form">
+          <label for="p2pDeviceName">这台电脑的名称</label>
+          <input id="p2pDeviceName" maxlength="24" placeholder="例如：办公室电脑" required>
+          <div id="p2pCreateFields" class="inner-form">
+            <label for="p2pGroupName">设备组名称</label>
+            <input id="p2pGroupName" maxlength="64" placeholder="例如：我的设备" required>
+            <label for="p2pRetentionDays">内容默认保留天数</label>
+            <input id="p2pRetentionDays" type="number" min="1" max="365" value="3" required>
+          </div>
+          <div id="p2pJoinFields" class="inner-form" hidden>
+            <label for="p2pInviteName">现有设备生成的邀请文件</label>
+            <span class="file-row"><input id="p2pInviteName" type="text" placeholder="选择 .tdjoin 文件" readonly><button type="button" id="chooseInvite">选择邀请文件</button></span>
+            <input id="p2pInviteInput" type="file" accept=".tdjoin,application/json" hidden>
+          </div>
+          <div class="notice">邀请有效期为 24 小时。新设备导入邀请后，还需要由现有设备明确批准。</div>
+          <button class="save" id="p2pSubmit" type="submit">创建设备组</button>
+        </form>
+      </div>
+
+      <div id="p2pManager" hidden>
+        <div class="group-summary"><div><span>当前设备组</span><b id="currentGroupName">正在读取</b></div><code id="currentGroupId">正在读取</code></div>
+        <div class="manager-actions"><button type="button" class="save" id="createInvite">生成新设备邀请</button><p>保存为 `.tdjoin` 文件，通过可信渠道发给另一台电脑。邀请不包含文件内容。</p></div>
+        <div class="manager-section"><div class="manager-heading"><h2>组内设备</h2><span>绿色表示当前在线</span></div><div id="memberList" class="device-list"><div class="loading-row">正在读取设备状态…</div></div></div>
+        <div class="manager-section" id="pendingSection" hidden><div class="manager-heading"><h2>等待你的批准</h2><span>核对设备名称后再允许</span></div><div id="pendingList" class="device-list"></div></div>
+        <div class="manager-section retention-editor"><h2>新内容留存时长</h2><div class="retention-row"><input id="p2pRetentionAmount" type="number" min="1" max="8760" aria-label="留存时长数值"><select id="p2pRetentionUnit" aria-label="留存时长单位"><option value="24">天</option><option value="1">小时</option></select><button type="button" id="saveRetention">保存留存时长</button></div><p>修改会同步到组内设备，并对之后创建的新内容生效。</p></div>
+        <button class="secondary-close" type="button" id="finishP2P">完成并关闭设置</button>
+      </div>
+    </section>
+
+    <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+  </main>
+  <script src="setup.js"></script>
+</body>
+</html>

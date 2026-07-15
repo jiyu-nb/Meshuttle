@@ -1,0 +1,26 @@
+{
+  "name": "meshuttle-server",
+  "version": "1.0.0",
+  "private": false,
+  "description": "织梭 Meshuttle 固定服务器",
+  "license": "MIT",
+  "author": "集御",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jiyu-nb/Meshuttle.git",
+    "directory": "server"
+  },
+  "homepage": "https://github.com/jiyu-nb/Meshuttle#readme",
+  "bugs": {
+    "url": "https://github.com/jiyu-nb/Meshuttle/issues"
+  },
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm --prefix client ci
+      - run: npm --prefix client run fetch:syncthing
+      - run: npm --prefix server test
+      - run: npm --prefix client test
+      - run: npm --prefix client run test:p2p
+      - run: node --check client/main.js
+      - run: node --check client/preload.js
+      - run: node --check client/renderer/renderer.js
+      - run: node --check client/renderer/mini.js
+      - run: node --check client/renderer/setup.js
+      - run: node --check client/p2p/store.js
+      - run: node --check client/p2p/syncthing.js
+      - run: node --check client/p2p/group.js
+      - run: npm --prefix client run dist
