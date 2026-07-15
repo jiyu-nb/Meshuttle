@@ -10,10 +10,10 @@ $binaryPath = Join-Path $targetDir 'syncthing.exe'
 if (Test-Path -LiteralPath $binaryPath) {
   $versionOutput = & $binaryPath --version
   if ($versionOutput -match "syncthing v$([regex]::Escape($version))") {
-    Write-Host "Syncthing v$version 已就绪。"
+    Write-Host "Syncthing v$version is ready."
     exit 0
   }
-  throw "已有 Syncthing 版本不匹配：$versionOutput"
+  throw "The existing Syncthing version does not match: $versionOutput"
 }
 
 $downloadUrl = "https://github.com/syncthing/syncthing/releases/download/v$version/$assetName"
@@ -23,15 +23,15 @@ $extractPath = Join-Path $temporaryRoot 'extract'
 New-Item -ItemType Directory -Path $temporaryRoot, $extractPath -Force | Out-Null
 
 try {
-  Write-Host "正在从 Syncthing 官方 GitHub Release 下载 v$version..."
+  Write-Host "Downloading Syncthing v$version from the official GitHub Release..."
   Invoke-WebRequest -Uri $downloadUrl -OutFile $archivePath
   $actualSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $archivePath).Hash.ToLowerInvariant()
   if ($actualSha256 -ne $expectedSha256) {
-    throw "Syncthing 下载校验失败。期望 $expectedSha256，实际 $actualSha256"
+    throw "Syncthing checksum mismatch. Expected $expectedSha256, got $actualSha256"
   }
   Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath
   $sourceDir = Get-ChildItem -LiteralPath $extractPath -Directory | Select-Object -First 1
-  if (-not $sourceDir) { throw 'Syncthing 压缩包结构无效' }
+  if (-not $sourceDir) { throw 'Invalid Syncthing archive structure' }
   New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
   foreach ($name in @('syncthing.exe', 'LICENSE.txt', 'AUTHORS.txt', 'README.txt')) {
     Copy-Item -LiteralPath (Join-Path $sourceDir.FullName $name) -Destination $targetDir -Force
@@ -42,7 +42,7 @@ try {
     $resolved = (Resolve-Path -LiteralPath $temporaryRoot).Path
     $tempBase = [IO.Path]::GetTempPath().TrimEnd('\')
     if (-not $resolved.StartsWith($tempBase, [StringComparison]::OrdinalIgnoreCase)) {
-      throw "拒绝清理临时目录之外的路径：$resolved"
+      throw "Refusing to clean a path outside the temporary directory: $resolved"
     }
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }
