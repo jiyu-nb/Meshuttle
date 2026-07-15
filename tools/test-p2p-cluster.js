@@ -8,7 +8,8 @@ const { SyncthingController } = require('../client/p2p/syncthing');
 const { encodeDeviceName, inviteProof } = require('../client/p2p/group');
 
 const root = path.resolve(__dirname, '..', '.tmp', 'p2p-cluster-integration');
-const binaryPath = path.resolve(__dirname, '..', 'client', 'vendor', 'syncthing', 'syncthing.exe');
+const syncthingExecutable = process.platform === 'win32' ? 'syncthing.exe' : 'syncthing';
+const binaryPath = path.resolve(__dirname, '..', 'client', 'vendor', 'syncthing', syncthingExecutable);
 const folderId = `ms-integration-${Date.now()}`;
 const token = 'integration-local-api-token-long-enough';
 const nodes = [];
