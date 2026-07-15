@@ -7,6 +7,22 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $targetDir = Join-Path $projectRoot 'client\vendor\syncthing'
 $binaryPath = Join-Path $targetDir 'syncthing.exe'
 
+function Get-Sha256Hex {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $stream = [IO.File]::OpenRead($Path)
+  try {
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+      return ([BitConverter]::ToString($sha256.ComputeHash($stream))).Replace('-', '').ToLowerInvariant()
+    } finally {
+      $sha256.Dispose()
+    }
+  } finally {
+    $stream.Dispose()
+  }
+}
+
 if (Test-Path -LiteralPath $binaryPath) {
   $versionOutput = & $binaryPath --version
   if ($versionOutput -match "syncthing v$([regex]::Escape($version))") {
@@ -25,7 +41,7 @@ New-Item -ItemType Directory -Path $temporaryRoot, $extractPath -Force | Out-Nul
 try {
   Write-Host "Downloading Syncthing v$version from the official GitHub Release..."
   Invoke-WebRequest -Uri $downloadUrl -OutFile $archivePath
-  $actualSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $archivePath).Hash.ToLowerInvariant()
+  $actualSha256 = Get-Sha256Hex -Path $archivePath
   if ($actualSha256 -ne $expectedSha256) {
     throw "Syncthing checksum mismatch. Expected $expectedSha256, got $actualSha256"
   }
