@@ -120,6 +120,29 @@ async function main() {
       return bKnowsC && cKnowsB;
     }, 90_000, '子机没有通过介绍者互相发现');
 
+    progress('锁定测试子机的回环直连地址并等待连接');
+    await childB.controller.ensureDevice({
+      deviceId: childC.controller.deviceId,
+      name: encodeDeviceName(childC.name, inviteProof(inviteC, childC.controller.deviceId)),
+      addresses: [childC.syncAddress],
+      skipIntroductionRemovals: true
+    });
+    await childC.controller.ensureDevice({
+      deviceId: childB.controller.deviceId,
+      name: encodeDeviceName(childB.name, inviteProof(inviteB, childB.controller.deviceId)),
+      addresses: [childB.syncAddress],
+      skipIntroductionRemovals: true
+    });
+    await waitFor(async () => {
+      const [statusB, statusC] = await Promise.all([
+        childB.controller.groupStatus(folderId),
+        childC.controller.groupStatus(folderId)
+      ]);
+      const bConnected = statusB.members.some((member) => member.deviceId === childC.controller.deviceId && member.connected);
+      const cConnected = statusC.members.some((member) => member.deviceId === childB.controller.deviceId && member.connected);
+      return bConnected && cConnected;
+    }, 30_000, '子机回环直连没有建立');
+
     progress('关闭母机，验证剩余子机仍能直接同步');
     await mother.controller.stop();
     const afterFailover = await stores[1].createText('母机退出后的内容');
