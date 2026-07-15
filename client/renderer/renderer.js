@@ -260,7 +260,7 @@ $('#chooseFile').addEventListener('click', () => $('#fileInput').click());
 $('#emptyChoose').addEventListener('click', () => $('#fileInput').click());
 $('#fileInput').addEventListener('change', (event) => upload(event.target.files));
 sendText.addEventListener('click', () => submitText(textInput.value));
-textInput.addEventListener('keydown', (event) => { if (event.ctrlKey && event.key === 'Enter') { event.preventDefault(); submitText(textInput.value); } });
+textInput.addEventListener('keydown', (event) => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); submitText(textInput.value); } });
 $('#refresh').addEventListener('click', () => refresh());
 $('#settings').addEventListener('click', () => window.meshuttle.openSettings());
 $('#openLicenses').addEventListener('click', () => window.meshuttle.openLicenses());

@@ -30,12 +30,12 @@ class SyncthingController {
       '--no-browser',
       '--no-restart',
       '--no-upgrade',
-      '--no-console',
       `--gui-address=http://127.0.0.1:${this.apiPort}`,
       `--gui-apikey=${this.apiKey}`,
       '--log-level=WARN',
       '--log-file=-'
     ];
+    if (process.platform === 'win32') args.splice(5, 0, '--no-console');
     this.process = spawn(this.binaryPath, args, {
       windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe'],
