@@ -19,7 +19,7 @@
     "start": "electron .",
     "test": "node --test",
     "test:p2p": "node ../tools/test-p2p-cluster.js",
-    "dist": "electron-builder --win nsis"
+    "dist": "electron-builder --win nsis --publish never"
   },
   "build": {
     "appId": "cn.jiyu.meshuttle",
