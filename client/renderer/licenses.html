@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>织梭开源许可</title>
+  <link rel="stylesheet" href="licenses.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p>OPEN SOURCE NOTICES</p>
+      <h1>开源许可</h1>
+      <span>织梭 Meshuttle 1.1.0 · 作者 集御</span>
+    </header>
+
+    <section>
+      <h2>织梭 Meshuttle</h2>
+      <p>织梭自有源代码采用 MIT License。你可以使用、复制、修改和再发布，但应保留版权与许可声明。</p>
+      <div class="tag">MIT</div>
+    </section>
+
+    <section>
+      <h2>Syncthing 2.1.2</h2>
+      <p>桌面端“设备互联”模式捆绑并启动未经修改的独立 Syncthing 可执行程序。Syncthing 采用 Mozilla Public License 2.0。</p>
+      <ul>
+        <li>安装目录：<code>resources/syncthing/</code></li>
+        <li>许可证：<code>resources/syncthing/LICENSE.txt</code></li>
+        <li>作者名单：<code>resources/syncthing/AUTHORS.txt</code></li>
+      </ul>
+      <div class="actions">
+        <button type="button" id="openSource">查看对应版本源码</button>
+        <button type="button" id="openMpl">查看 MPL-2.0</button>
+      </div>
+    </section>
+
+    <aside>Android 客户端不包含 Syncthing；macOS 与 Windows 桌面端包含相同版本的独立 Syncthing 组件。</aside>
+    <button type="button" class="close" id="closeLicenses">关闭</button>
+  </main>
+  <script src="licenses.js"></script>
+</body>
+</html>

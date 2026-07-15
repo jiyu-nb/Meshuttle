@@ -263,6 +263,7 @@ sendText.addEventListener('click', () => submitText(textInput.value));
 textInput.addEventListener('keydown', (event) => { if (event.ctrlKey && event.key === 'Enter') { event.preventDefault(); submitText(textInput.value); } });
 $('#refresh').addEventListener('click', () => refresh());
 $('#settings').addEventListener('click', () => window.meshuttle.openSettings());
+$('#openLicenses').addEventListener('click', () => window.meshuttle.openLicenses());
 $('#openGroup').addEventListener('click', () => window.meshuttle.openSettings('p2p'));
 $('#selectAll').addEventListener('click', () => {
   const allSelected = currentItems.length > 0 && currentItems.every((item) => selectedIds.has(item.id));
@@ -299,6 +300,6 @@ $('#deleteSelected').addEventListener('click', async () => {
 
 window.meshuttle.getSetup().then((current) => {
   setupMode = current.mode || 'remote';
-  $('#versionText').textContent = `v${current.version || '1.0.0'}`;
+  $('#versionText').textContent = `v${current.version || '1.1.0'}`;
 }).catch(() => {}).finally(() => refresh());
 setInterval(() => refresh(true), 4000);

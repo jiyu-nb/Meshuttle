@@ -7,4 +7,10 @@ client/deployment-config.json
 client/server-cert.pem
 client/electron-dist/
 client/vendor/syncthing/syncthing.exe
+client/vendor/syncthing/syncthing
 .tmp/
+android/.gradle/
+android/**/build/
+android/local.properties
+android/*.jks
+android/*.keystore

@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, dialog, ipcMain, safeStorage, screen } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, safeStorage, screen, shell } = require('electron');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
@@ -26,6 +26,7 @@ const {
 let mainWindow;
 let miniWindow;
 let setupWindow;
+let licensesWindow;
 let config;
 let settings;
 let embeddedApp;
@@ -218,6 +219,27 @@ function createAppWindows() {
   if (!miniWindow || miniWindow.isDestroyed()) createMiniWindow();
 }
 
+function createLicensesWindow() {
+  if (licensesWindow && !licensesWindow.isDestroyed()) {
+    licensesWindow.show();
+    licensesWindow.focus();
+    return;
+  }
+  licensesWindow = new BrowserWindow({
+    width: 680,
+    height: 660,
+    minWidth: 560,
+    minHeight: 500,
+    parent: mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined,
+    backgroundColor: '#0b0d10',
+    title: '织梭开源许可',
+    autoHideMenuBar: true,
+    webPreferences: webPreferences()
+  });
+  licensesWindow.loadFile(path.join(__dirname, 'renderer', 'licenses.html'));
+  licensesWindow.on('closed', () => { licensesWindow = null; });
+}
+
 function createSetupWindow(errorMessage = '', preferredMode = '') {
   if (setupWindow && !setupWindow.isDestroyed()) {
     if (['remote', 'host', 'p2p'].includes(preferredMode)) setupWindow.webContents.send('setup:select-mode', preferredMode);
@@ -292,9 +314,10 @@ function syncthingHomeDir(groupId) {
 }
 
 function syncthingBinaryPath() {
+  const executableName = process.platform === 'win32' ? 'syncthing.exe' : 'syncthing';
   return app.isPackaged
-    ? path.join(process.resourcesPath, 'syncthing', 'syncthing.exe')
-    : path.join(__dirname, 'vendor', 'syncthing', 'syncthing.exe');
+    ? path.join(process.resourcesPath, 'syncthing', executableName)
+    : path.join(__dirname, 'vendor', 'syncthing', executableName);
 }
 
 async function stopP2PRuntime() {
@@ -806,6 +829,21 @@ function registerIpc() {
     return { ok: true };
   });
   ipcMain.handle('window:open-settings', (_event, preferredMode) => { createSetupWindow('', preferredMode); return { ok: true }; });
+  ipcMain.handle('window:open-licenses', () => { createLicensesWindow(); return { ok: true }; });
+  ipcMain.handle('window:close-licenses', () => {
+    if (licensesWindow && !licensesWindow.isDestroyed()) licensesWindow.close();
+    return { ok: true };
+  });
+  ipcMain.handle('app:open-external', (_event, value) => {
+    const target = new URL(String(value || ''));
+    const allowed = target.protocol === 'https:' && (
+      target.hostname === 'www.mozilla.org' ||
+      target.hostname === 'mozilla.org' ||
+      target.hostname === 'github.com'
+    );
+    if (!allowed) throw new Error('不允许打开此链接');
+    return shell.openExternal(target.toString());
+  });
   ipcMain.handle('window:close-setup', () => {
     if (setupWindow && !setupWindow.isDestroyed()) setupWindow.close();
     return { ok: true };

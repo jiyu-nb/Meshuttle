@@ -1,6 +1,6 @@
 {
   "name": "meshuttle",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": false,
   "author": "集御",
   "description": "支持自建服务器、局域网托管和无固定主机设备组的跨设备临时投递箱",
@@ -15,16 +15,17 @@
   },
   "main": "main.js",
   "scripts": {
-    "fetch:syncthing": "powershell -ExecutionPolicy Bypass -File ../tools/fetch-syncthing.ps1",
+    "fetch:syncthing": "node ../tools/fetch-syncthing.mjs",
     "start": "electron .",
     "test": "node --test",
     "test:p2p": "node ../tools/test-p2p-cluster.js",
-    "dist": "electron-builder --win nsis --publish never"
+    "dist": "npm run dist:win",
+    "dist:win": "electron-builder --win nsis --publish never",
+    "dist:mac": "electron-builder --mac --universal --publish never"
   },
   "build": {
     "appId": "cn.jiyu.meshuttle",
     "productName": "织梭 Meshuttle",
-    "artifactName": "Meshuttle-Setup-${version}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -41,13 +42,31 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "../THIRD_PARTY_NOTICES.md",
+        "to": "THIRD_PARTY_NOTICES.md"
+      },
+      {
+        "from": "../LICENSE",
+        "to": "LICENSE-MESHUTTLE.txt"
       }
     ],
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
       "executableName": "Meshuttle",
+      "artifactName": "Meshuttle-Setup-${version}.${ext}",
       "legalTrademarks": "Copyright © 2026 集御"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.utilities",
+      "artifactName": "Meshuttle-${version}-macOS-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,

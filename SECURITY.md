@@ -14,7 +14,12 @@
 - 设备互联的内容以普通文件形式保存在每个成员设备的当前用户数据目录。磁盘加密、Windows 账户安全和设备处置由用户负责。
 - 应用到期清理不保证从文件系统日志、磁盘快照、备份或第三方恢复工具中不可恢复。
 - 公共发现和公共中继是外部服务，本项目不承诺其可用性或服务等级。
+- 桌面端的访问码与设备组秘密通过 Electron `safeStorage` 保护；具体安全强度取决于 Windows 凭据保护或 macOS 钥匙串以及当前系统账户安全。
+- Android 客户端使用 Android Keystore 中不可直接导出的 AES 密钥，以 AES-GCM 加密保存访问码。解锁设备并运行织梭的用户仍可使用该访问码访问已配置服务。
+- Android 允许连接局域网 HTTP 地址，以便使用桌面端本机托管；不要把未加密 HTTP 暴露到公网。公网服务器必须使用有效 HTTPS。
+- Android 1.1.0 不包含 Syncthing，不参加设备互联，也不会在后台充当同步节点。
+- Windows、macOS 和 Android 的正式公开分发分别需要 Authenticode、Apple Developer ID/公证和稳定 Android 发布密钥。缺少平台签名时必须在发布页明确标为未签名或测试签名。
 
 ## 开源构建
 
-Syncthing 通过 `tools/fetch-syncthing.ps1` 下载固定版本并校验 SHA-256。发布构建不应包含真实的 `deployment-config.json`、服务器证书、访问码或测试数据。
+Syncthing 通过 `tools/fetch-syncthing.mjs` 下载固定版本并校验 SHA-256；PowerShell 脚本只是兼容入口。发布构建不应包含真实的 `deployment-config.json`、服务器证书、访问码、签名私钥或测试数据。

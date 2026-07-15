@@ -9,7 +9,8 @@ const rendererDir = path.resolve(__dirname, '..', 'renderer');
 const pages = [
   ['index.html', 'renderer.js'],
   ['mini.html', 'mini.js'],
-  ['setup.html', 'setup.js']
+  ['setup.html', 'setup.js'],
+  ['licenses.html', 'licenses.js']
 ];
 const retiredBrands = [
   ['Three', 'Drop'],

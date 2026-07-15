@@ -44,6 +44,8 @@ button.nav-item:hover { border-color: var(--line); background: var(--surface-2);
 .side-status.offline .status-dot { background: var(--danger); box-shadow: 0 0 0 3px rgba(240,106,99,.1); }
 .side-status p { margin: 8px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
 .sidebar footer { display: flex; flex-wrap: wrap; gap: 6px 10px; padding: 14px 6px 0; color: #707985; font-size: 9px; }
+.sidebar footer button { padding: 0; border: 0; background: transparent; color: #8f99a5; font-size: 9px; text-decoration: underline; text-underline-offset: 2px; }
+.sidebar footer button:hover { color: var(--amber); }
 
 .content { min-width: 0; padding: 35px clamp(28px, 4vw, 54px) 50px; }
 .content-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
