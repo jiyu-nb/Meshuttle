@@ -104,10 +104,13 @@ class SyncthingController {
     const deviceId = validateDeviceId(device.deviceId);
     const devices = await this.api('GET', '/rest/config/devices');
     const existing = devices.find((entry) => entry.deviceID === deviceId);
+    const addresses = Array.isArray(device.addresses) && device.addresses.length > 0
+      ? device.addresses.map((value) => String(value))
+      : ['dynamic'];
     const changes = {
       deviceID: deviceId,
       name: String(device.name || '').slice(0, 64),
-      addresses: ['dynamic'],
+      addresses,
       introducer: Boolean(device.introducer),
       skipIntroductionRemovals: Boolean(device.skipIntroductionRemovals),
       autoAcceptFolders: false,

@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 const fsp = require('node:fs/promises');
+const net = require('node:net');
 const path = require('node:path');
 const { createP2PStore } = require('../client/p2p/store');
 const { SyncthingController } = require('../client/p2p/syncthing');
@@ -27,7 +28,17 @@ async function main() {
         homeDir: path.join(root, slug, 'syncthing')
       });
       await controller.start();
-      nodes.push({ name, slug, controller, dataDir: path.join(root, slug, 'shared') });
+      const syncPort = await findFreePort();
+      const syncAddress = `tcp://127.0.0.1:${syncPort}`;
+      await controller.api('PATCH', '/rest/config/options', {
+        listenAddresses: [syncAddress],
+        globalAnnounceEnabled: false,
+        localAnnounceEnabled: false,
+        relaysEnabled: false,
+        natEnabled: false
+      });
+      await delay(500);
+      nodes.push({ name, slug, controller, syncAddress, dataDir: path.join(root, slug, 'shared') });
     }
 
     const [mother, childB, childC] = nodes;
@@ -42,6 +53,7 @@ async function main() {
       await child.controller.ensureDevice({
         deviceId: mother.controller.deviceId,
         name: encodeDeviceName(mother.name, 'owner'),
+        addresses: [mother.syncAddress],
         introducer: true,
         skipIntroductionRemovals: true
       });
@@ -62,10 +74,19 @@ async function main() {
       [childB.controller.deviceId, inviteProof(inviteB, childB.controller.deviceId)],
       [childC.controller.deviceId, inviteProof(inviteC, childC.controller.deviceId)]
     ]);
+    const childAddresses = new Map([
+      [childB.controller.deviceId, childB.syncAddress],
+      [childC.controller.deviceId, childC.syncAddress]
+    ]);
     for (const entry of pending) {
       if (!proofs.has(entry.deviceId)) continue;
       if (!String(entry.name).endsWith(proofs.get(entry.deviceId))) throw new Error(`邀请码证明不匹配：${entry.deviceId}`);
-      await mother.controller.ensureDevice({ deviceId: entry.deviceId, name: entry.name, skipIntroductionRemovals: true });
+      await mother.controller.ensureDevice({
+        deviceId: entry.deviceId,
+        name: entry.name,
+        addresses: [childAddresses.get(entry.deviceId)],
+        skipIntroductionRemovals: true
+      });
       await mother.controller.shareFolder(folderId, entry.deviceId);
     }
 
@@ -138,6 +159,22 @@ async function waitFor(check, timeoutMs, errorMessage) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   throw new Error(`${errorMessage}${lastError ? `：${lastError.message}` : ''}`);
+}
+
+async function findFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      server.close(() => resolve(address.port));
+    });
+  });
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function progress(message) {
