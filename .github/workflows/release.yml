@@ -81,15 +81,14 @@ jobs:
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
           mkdir -p android/artifacts
-          if [[ -n "${ANDROID_KEYSTORE_BASE64:-}" ]]; then
-            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/android/meshuttle-release.jks"
-            export ANDROID_KEYSTORE_PATH="$GITHUB_WORKSPACE/android/meshuttle-release.jks"
-            gradle -p android :app:assembleRelease --stacktrace
-            cp android/app/build/outputs/apk/release/app-release.apk "android/artifacts/Meshuttle-${version}-Android.apk"
-          else
-            gradle -p android :app:assembleDebug --stacktrace
-            cp android/app/build/outputs/apk/debug/app-debug.apk "android/artifacts/Meshuttle-${version}-Android-debug.apk"
+          if [[ -z "${ANDROID_KEYSTORE_BASE64:-}" || -z "${ANDROID_KEYSTORE_PASSWORD:-}" || -z "${ANDROID_KEY_ALIAS:-}" || -z "${ANDROID_KEY_PASSWORD:-}" ]]; then
+            echo "::error::Android release signing secrets are required; refusing to publish a debug-signed APK."
+            exit 1
           fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/android/meshuttle-release.jks"
+          export ANDROID_KEYSTORE_PATH="$GITHUB_WORKSPACE/android/meshuttle-release.jks"
+          gradle -p android :app:assembleRelease --stacktrace
+          cp android/app/build/outputs/apk/release/app-release.apk "android/artifacts/Meshuttle-${version}-Android.apk"
       - uses: actions/upload-artifact@v4
         with:
           name: android
